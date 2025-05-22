@@ -1,0 +1,26 @@
+{
+  "name": "load-markdown-files-to-vectordb",
+  "version": "1.0.0",
+  "description": "Load markdown files into a vector database",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "rag",
+    "vectordb",
+    "typescript",
+    "langchain",
+    "ollama"
+  ],
+  "author": "sebaeze@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "@langchain/community": "^0.3.43",
+    "@langchain/ollama": "^0.2.0",
+    "@langchain/pinecone": "^0.2.0",
+    "@types/node": "^22.15.21",
+    "dotenv": "^16.5.0",
+    "typescript": "^5.8.3"
+  }
+}
