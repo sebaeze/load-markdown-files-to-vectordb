@@ -73,12 +73,34 @@ export async function ingestMarkdownFiles(directoryPath: string) {
     //
     console.log(`Using existing Pinecone index: ${PINECONE_INDEX_NAME}`);
     //
-    console.log("Loading documents into Pinecone...");
-    await PineconeStore.fromDocuments(docs, embeddings, {
+    console.log("Initializing Pinecone store for sequential ingestion...");
+    const pineconeStore = await PineconeStore.fromExistingIndex(embeddings, {
       pineconeIndex: index,
-      namespace: "ns-markdown-docs"
+      namespace: process.env.PINECONE_NAMESPACE || "ns-markdown-docs",
     });
 
+    console.log(
+      `Starting sequential ingestion of ${docs.length} document chunks...`
+    );
+    for (let i = 0; i < docs.length; i++) {
+      const doc = docs[i];
+      // Log more detailed information for each chunk
+      const source = doc.metadata?.source || "N/A";
+      const contentLength = doc.pageContent.length;
+      console.log(
+        `Ingesting chunk ${i + 1}/${
+          docs.length
+        }. Source: ${source}, Length: ${contentLength} chars.`
+      );
+      try {
+        // addDocuments expects an array of Document objects
+        await pineconeStore.addDocuments([doc]);
+      } catch (e) {
+        console.error(`Error ingesting chunk ${i + 1}/${docs.length} (Source: ${source}):`, e);
+        // Depending on requirements, you might want to re-throw the error
+        // or collect failed chunks for later processing. Here, we just log and continue.
+      }
+    }
     console.log("Markdown files successfully loaded into Pinecone!");
   } catch (error) {
     console.error("Error ingesting markdown files:", error);
