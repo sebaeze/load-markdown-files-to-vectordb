@@ -1,8 +1,6 @@
 import { Pinecone } from "@pinecone-database/pinecone";
-//import { DirectoryLoader } from "@langchain/community/document_loaders/fs/directory";
 import { DirectoryLoader } from "langchain/document_loaders/fs/directory";
 import { TextLoader } from "langchain/document_loaders/fs/text";
-//import { TextLoader } from "@langchain/community/document_loaders/fs/text";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { OllamaEmbeddings } from "@langchain/community/embeddings/ollama";
 import { PineconeStore } from "@langchain/pinecone";
@@ -28,7 +26,7 @@ if (!OLLAMA_BASE_URL) {
 }
 
 
-async function ingestMarkdownFiles(directoryPath: string) {
+export async function ingestMarkdownFiles(directoryPath: string) {
   try {
     console.log(`Loading markdown files from: ${directoryPath}`);
 
@@ -56,19 +54,9 @@ async function ingestMarkdownFiles(directoryPath: string) {
 
     // 3. Initialize Embeddings (using Ollama's nomic-embed-text)
     const embeddings = new OllamaEmbeddings({
-      model: "nomic-embed-text", // Or another embedding model available on your Ollama server
+      model: process.env.MODEL_NAME||"nomic-embed-text",
       baseUrl: OLLAMA_BASE_URL,
     });
-
-    // If using Google Generative AI Embeddings, replace the above with:
-    /*
-    const embeddings = new GoogleGenerativeAIEmbeddings({
-      apiKey: GOOGLE_API_KEY,
-      model: "text-embedding-004", // Ensure this model is available and you have access
-    });
-    console.log("Using Google Generative AI Embeddings.");
-    */
-    console.log("Using Ollama Embeddings with model: nomic-embed-text");
 
     // 4. Initialize Pinecone
     const pinecone = new Pinecone({
@@ -96,13 +84,4 @@ async function ingestMarkdownFiles(directoryPath: string) {
     console.error("Error ingesting markdown files:", error);
   }
 }
-// Specify the folder containing your markdown files
-const MARKDOWN_FOLDER = path.resolve(__dirname, "../markdown_files");
-//
-if (!fs.existsSync(MARKDOWN_FOLDER)) {
-  fs.mkdirSync(MARKDOWN_FOLDER);
-  console.log(`Created directory: ${MARKDOWN_FOLDER}`);
-}
-//
-ingestMarkdownFiles(MARKDOWN_FOLDER);
 //
